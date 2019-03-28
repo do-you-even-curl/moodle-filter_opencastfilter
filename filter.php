@@ -28,6 +28,9 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/filter/opencast/lib.php');
 
+use \moodle_url;
+use \tool_opencast\local\api;
+
 /**
  * Automatic opencast videos filter class.
  *
@@ -39,6 +42,43 @@ require_once($CFG->dirroot . '/filter/opencast/lib.php');
 class filter_opencast extends moodle_text_filter {
 
     private static $loginrendered = false;
+
+    private function get_thumb_url($src) {
+        $thumbsrc = null;
+        $videourl = new moodle_url($src);
+        $videoid = $videourl->get_param('id');
+        if (!$videoid) {
+            return null;
+        }
+
+        $api = new api();
+        $query = '/api/events/' . $videoid . '/publications/';
+        $result = $api->oc_get($query);
+        $publications = json_decode($result);
+
+        if (empty($publications)) {
+            return null;
+        }
+
+        foreach ($publications as $publication) {
+
+            if ($publication->channel == 'api') {
+                // Try finding the best preview image:
+                // presentation/player+preview > presenter/player+preview > any other preview
+                foreach ($publication->attachments as $attachment) {
+                    if (!empty($attachment->url) && strpos($attachment->flavor, '+preview') > 0) {
+                        if (!isset($thumbsrc) || strpos($attachment->flavor, '/player+preview') > 0) {
+                            $thumbsrc = $attachment->url;
+                            if ($attachment->flavor === 'presentation/player+preview') {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $thumbsrc;
+    }
 
     public function filter($text, array $options = array()) {
         global $PAGE;
@@ -72,7 +112,7 @@ class filter_opencast extends moodle_text_filter {
             $video = false;
 
             foreach ($matches as $match) {
-            	// Check if the match is a video tag.
+                // Check if the match is a video tag.
                 if (substr($match, 0, 6) === "<video") {
                     $video = true;
                 } else if ($video) {
@@ -94,16 +134,19 @@ class filter_opencast extends moodle_text_filter {
                             $link = 'http://' . $link;
                         }
 
-                        // Create source with embedded mode.
-                        $src = $link;
+                        // Create source with autoplay enabled.
+                        $playerurl = new moodle_url($link);
+                        $playerurl->param('autoplay', 'true');
+                        $src = $playerurl->out(false);
 
                         // Collect the needed data being submitted to the template.
                         $mustachedata = new stdClass();
                         $mustachedata->loggedin = $loggedin;
                         $mustachedata->src = $src;
                         $mustachedata->link = $link;
+                        $mustachedata->thumbsrc = $this->get_thumb_url($src);
 
-                        $newtext =  $renderer->render_player($mustachedata);
+                        $newtext = $renderer->render_player($mustachedata);
 
                         // Replace video tag.
                         $text = preg_replace('/<video(?:(?!<\/video>).)*?' . preg_quote($match, '/') . '.*?<\/video>/', $newtext, $text, 1);

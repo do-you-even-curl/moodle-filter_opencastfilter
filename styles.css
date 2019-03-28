@@ -1,0 +1,46 @@
+.ocplayer {
+    width: 95%;
+    height: 450px;
+    border: 0;
+}
+
+@media only screen and (min-width: 576px) and (max-width: 767px) {
+    .ocplayer {
+        height: 300px;
+    }
+}
+
+@media only screen and (min-width: 360px) and (max-width: 575px) {
+    .ocplayer {
+        height: 200px;
+    }
+}
+
+@media only screen and (max-width: 359px) {
+    .ocplayer {
+        height: 116px;
+    }
+}
+.ocplayer.placeholder {
+    cursor: pointer;
+    background-color: #4b4b4b; /* same as opencast player */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+}
+.ocplayer.placeholder img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.ocplayer.placeholder .playButtonOnScreenIcon {
+    height: 100%;
+    width: 100%;
+    opacity: 0.7;
+}
