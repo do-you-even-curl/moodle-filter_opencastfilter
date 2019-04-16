@@ -37,7 +37,17 @@ require_once($CFG->libdir . '/weblib.php');
 class filter_opencast_renderer extends plugin_renderer_base {
 
     /**
-     * Display the player.
+     * Display the player preview.
+     *
+     * @param object $data The prepared variables.
+     * @return string
+     */
+    public function render_player_preview($data) {
+        return $this->render_from_template('filter_opencast/preview', $data);
+    }
+
+    /**
+     * Display the actual player.
      *
      * @param object $data The prepared variables.
      * @return string

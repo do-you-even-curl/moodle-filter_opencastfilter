@@ -44,3 +44,9 @@
     width: 100%;
     opacity: 0.7;
 }
+.page-ocplayerinternal {
+    margin: 0;
+}
+.page-ocplayerinternal iframe {
+    border-width: 0;
+}

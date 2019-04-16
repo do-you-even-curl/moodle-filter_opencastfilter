@@ -15,13 +15,17 @@
   along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-  @template filter_opencast/player
+  @template filter_opencast/preview
 
-  Opencast player template.
-  The purpose of this template is to render a opencast video.
+  Opencast player preview template.
+  Renders a preview for an opencast video.
 }}
 
-<body class="page-ocplayerinternal">
-  <iframe class="ocplayerinternal" src="about:blank" data-framesrc="{{src}}" style="width: 100%; height: 100%;">
-  </iframe>
-</body>
+{{! Print the iframe. }}
+<div class="ocplayer placeholder" data-framesrc="{{src}}">
+{{#thumbsrc}}
+  <img src="{{thumbsrc}}"></img>
+{{/thumbsrc}}
+  <canvas class="playButtonOnScreenIcon"></canvas>
+</div>
+{{! Print the link to the video. }}

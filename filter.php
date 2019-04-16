@@ -81,7 +81,7 @@ class filter_opencast extends moodle_text_filter {
     }
 
     public function filter($text, array $options = array()) {
-        global $PAGE;
+        global $COURSE, $PAGE;
 
         // Get baseurl either from engageurl setting or from opencast tool.
         $baseurl = get_config('filter_opencast', 'engageurl');
@@ -100,14 +100,7 @@ class filter_opencast extends moodle_text_filter {
         if ($matches) {
             $renderer = $PAGE->get_renderer('filter_opencast');
 
-            // Login if user is not logged in yet.
-            $loggedin = true;
-            if (!self::$loginrendered) {
-                // Login and set cookie.
-                filter_opencast_login();
-                $loggedin = false;
-                self::$loginrendered = true;
-            }
+            $PAGE->requires->js_call_amd('filter_opencast/preview', 'init');
 
             $video = false;
 
@@ -141,12 +134,15 @@ class filter_opencast extends moodle_text_filter {
 
                         // Collect the needed data being submitted to the template.
                         $mustachedata = new stdClass();
-                        $mustachedata->loggedin = $loggedin;
-                        $mustachedata->src = $src;
+                        $watchpage = new moodle_url('/filter/opencast/watch.php', [
+                            'courseid' => $COURSE->id,
+                            'videourl' => $src
+                        ]);
+                        $mustachedata->src = $watchpage->out(false);
                         $mustachedata->link = $link;
                         $mustachedata->thumbsrc = $this->get_thumb_url($src);
 
-                        $newtext = $renderer->render_player($mustachedata);
+                        $newtext = $renderer->render_player_preview($mustachedata);
 
                         // Replace video tag.
                         $text = preg_replace('/<video(?:(?!<\/video>).)*?' . preg_quote($match, '/') . '.*?<\/video>/', $newtext, $text, 1);
