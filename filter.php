@@ -143,7 +143,7 @@ class filter_opencast extends moodle_text_filter {
                         $playerurl = get_config('filter_opencast', 'playerurl');
 
                         // Change url for loading the (Paella) Player.
-                        $playerurl = new moodle_url($baseurl . $playerurl, ['id' => $id]);
+                        $playerurl = new moodle_url($baseurl . $playerurl, ['id' => $videoid]);
                         $playerurl->param('autoplay', 'true');
                         $src = $playerurl->out(false);
 
@@ -154,8 +154,7 @@ class filter_opencast extends moodle_text_filter {
                             'videourl' => $src
                         ]);
                         $mustachedata->src = $watchpage->out(false);
-                        $mustachedata->link = $link;
-                        $mustachedata->thumbsrc = $this->get_thumb_url($src);
+                        $mustachedata->thumbsrc = $this->get_thumb_url($videoid);
 
                         $newtext = $renderer->render_player_preview($mustachedata);
 
