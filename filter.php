@@ -43,11 +43,9 @@ class filter_opencast extends moodle_text_filter {
 
     private static $loginrendered = false;
 
-    private function get_thumb_url($src) {
-
+    private function get_video_id($src) {
         // Get videoid. Try to get it as a GET parameter. If that doesn't work use the element
         // following /api/ in the path and.
-        $thumbsrc = null;
         $videourl = new moodle_url($src);
         $videoid = $videourl->get_param('id');
         if (!$videoid) {
@@ -57,10 +55,13 @@ class filter_opencast extends moodle_text_filter {
                     $videoid = $path[$i + 1];
                 }
             }
-            if (!$videoid) {
-                return null;
-            }
         }
+        return $videoid;
+    }
+
+    private function get_thumb_url($videoid) {
+
+        $thumbsrc = null;
 
         $api = new api();
         $query = '/api/events/' . $videoid . '/publications/';
@@ -130,16 +131,19 @@ class filter_opencast extends moodle_text_filter {
 
                         // Extract url.
                         preg_match_all('/<source[^>]+src=([\'"])(?<src>.+?)\1[^>]*>/i', $match, $result);
-
-                        // Change url for loading the (Paella) Player.
-                        $link = $result['src'][0];
-
-                        if (strpos($link, 'http') !== 0) {
-                            $link = 'http://' . $link;
+                        $src = $result['src'][0];
+                        if (strpos($src, 'http') !== 0) {
+                            $src = 'http://' . $src;
                         }
 
-                        // Create source with autoplay enabled.
-                        $playerurl = new moodle_url($link);
+                        // Extract id.
+                        $videoid = $this->get_video_id($src);
+
+                        // Create link to video.
+                        $playerurl = get_config('filter_opencast', 'playerurl');
+
+                        // Change url for loading the (Paella) Player.
+                        $playerurl = new moodle_url($baseurl . $playerurl, ['id' => $id]);
                         $playerurl->param('autoplay', 'true');
                         $src = $playerurl->out(false);
 
