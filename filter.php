@@ -44,11 +44,22 @@ class filter_opencast extends moodle_text_filter {
     private static $loginrendered = false;
 
     private function get_thumb_url($src) {
+
+        // Get videoid. Try to get it as a GET parameter. If that doesn't work use the element
+        // following /api/ in the path and.
         $thumbsrc = null;
         $videourl = new moodle_url($src);
         $videoid = $videourl->get_param('id');
         if (!$videoid) {
-            return null;
+            $path = explode('/', $videourl->get_path(false));
+            for ($i = 0; $i + 1 < count($path); $i++) {
+                if ($path[$i] == 'api') {
+                    $videoid = $path[$i + 1];
+                }
+            }
+            if (!$videoid) {
+                return null;
+            }
         }
 
         $api = new api();
