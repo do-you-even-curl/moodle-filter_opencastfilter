@@ -28,7 +28,6 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/filter/opencast/lib.php');
 
-use \moodle_url;
 use \tool_opencast\local\api;
 
 /**
