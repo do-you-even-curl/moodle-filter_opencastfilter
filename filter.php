@@ -50,7 +50,7 @@ class filter_opencast extends moodle_text_filter {
         if (!$videoid) {
             $path = explode('/', $videourl->get_path(false));
             for ($i = 0; $i + 1 < count($path); $i++) {
-                if ($path[$i] == 'api') {
+                if ($path[$i] == 'api' || $path[$i] == 'play') {
                     $videoid = $path[$i + 1];
                 }
             }

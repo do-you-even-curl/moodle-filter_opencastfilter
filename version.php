@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2019032200;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version = 2019071700;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires = 2017050500;        // Requires this Moodle version.
 $plugin->component = 'filter_opencast'; // Full name of the plugin.
 $plugin->dependencies = [
