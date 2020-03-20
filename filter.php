@@ -57,13 +57,14 @@ class filter_opencast extends moodle_text_filter {
         // Looking for tags.
         $matches = preg_split('/(<[^>]*>)/i', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
+        $loginhtml = '';
         if ($matches) {
             $renderer = $PAGE->get_renderer('filter_opencast');
 
             // Login if user is not logged in yet.
             if (!self::$loginrendered) {
                 // Login and set cookie.
-                filter_opencast_login();
+                $loginhtml = filter_opencast_login();
                 self::$loginrendered = true;
             }
 
@@ -110,6 +111,6 @@ class filter_opencast extends moodle_text_filter {
         }
 
         // Return the same string except processed by the above.
-        return $text;
+        return $loginhtml . $text;
     }
 }
